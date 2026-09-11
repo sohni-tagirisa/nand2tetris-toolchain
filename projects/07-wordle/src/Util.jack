@@ -1,0 +1,49 @@
+// By Sohni Tagirisa
+// utility class with helper functions for strings and arrays
+class Util {
+    // returns a string literal (simple pass-through function)
+    function String str(String literal) { return literal; }
+
+    // fills an array with a specific value
+    function void fillInt(Array a, int len, int v) {
+        var int i;
+        let i = 0;
+        while (i < len) {
+            let a[i] = v;
+            let i = i + 1;
+        }
+        return;
+    }
+
+    // copies values from one array to another
+    function void copyArray(Array src, Array dst, int len) {
+        var int i;
+        let i = 0;
+        while (i < len) {
+            let dst[i] = src[i];
+            let i = i + 1;
+        }
+        return;
+    }
+
+    // compares two strings and returns true if they are equal
+    function boolean strEq(String a, String b) {
+        var int i;
+        var int la;  // length of first string
+        var int lb;  // length of second string
+
+        let la = a.length();
+        let lb = b.length();
+        // if lengths differ, strings are not equal
+        if (~(la = lb)) { return false; }
+
+        // check each character to see if they match
+        let i = 0;
+        while (i < la) {
+            if (~(a.charAt(i) = b.charAt(i))) { return false; }
+            let i = i + 1;
+        }
+        // all characters matched
+        return true;
+    }
+}

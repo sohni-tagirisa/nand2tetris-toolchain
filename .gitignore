@@ -1,0 +1,8 @@
+.DS_Store
+__MACOSX/
+__pycache__/
+*.py[cod]
+*.zip
+.pytest_cache/
+.venv/
+venv/

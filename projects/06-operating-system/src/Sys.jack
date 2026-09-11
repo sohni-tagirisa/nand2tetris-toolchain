@@ -1,0 +1,80 @@
+// name: Sohni Tagirisa
+// this file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// file name: projects/12/Sys.jack
+
+/**
+ * A library of basic system services.
+ */
+class Sys {
+
+    /** Performs all the initializations required by the OS. */
+    function void init() {
+        // initialize memory management first (other modules may need to allocate memory)
+        do Memory.init();
+
+        // initialize math operations
+        do Math.init();
+
+        // initialize screen graphics
+        do Screen.init();
+
+        // initialize text output
+        do Output.init();
+
+        // initialize keyboard input
+        do Keyboard.init();
+
+        // start the main program
+        do Main.main();
+
+        // halt when main returns (program is done)
+        do Sys.halt();
+        return;
+    }
+
+    /** Halts execution. */
+    function void halt() {
+        // infinite loop to stop program execution
+        while (true) {}
+        return;
+    }
+
+    /** Waits approximately duration milliseconds and then returns. */
+    function void wait(int duration) {
+        var int outerIdx;
+        var int innerIdx;
+
+        // duration must be positive
+        if (duration < 0) {
+            do Sys.error(1);
+        }
+
+        // outer loop runs duration times (simulating milliseconds)
+        let outerIdx = 0;
+        while (outerIdx < duration) {
+            // inner loop runs 200 times to calibrate one millisecond
+            // this creates a delay that approximates 1ms on the hack platform
+            let innerIdx = 0;
+            while (innerIdx < 200) {
+                let innerIdx = innerIdx + 1;
+            }
+            let outerIdx = outerIdx + 1;
+        }
+        return;
+    }
+
+    /** Prints the given error code in the form "ERR<errorCode>", and halts. */
+    function void error(int errorCode) {
+        // print error prefix
+        do Output.printString("ERR");
+
+        // print the error code number
+        do Output.printInt(errorCode);
+
+        // halt the program
+        do Sys.halt();
+        return;
+    }
+}

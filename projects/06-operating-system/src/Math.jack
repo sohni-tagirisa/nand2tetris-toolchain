@@ -1,0 +1,181 @@
+// name: Sohni Tagirisa
+// this file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// file name: projects/12/Math.jack
+
+/**
+ *  A library of commonly used mathematical functions.
+ *  All functions runs in O(n), where n is the number of bits used
+ *  for representing a two's complement integer value (16 in the Hack computer).
+ *  Note: Jack compilers implement multiplication and division
+ *  using calls to OS functions in this class.
+ */
+class Math {
+    // number of bits used for representing a two's complement integer
+    static int numBits;
+    // stores 2^0 to 2^(numBits-1)
+    static Array powersOfTwo;
+
+    // initializes the Math library by computing all powers of 2
+    function void init() {
+        var int idx, power;
+
+        let numBits = 16;
+        let powersOfTwo = Array.new(16);
+
+        let power = 1;
+        let idx = 0;
+        // populate powers of two array
+        while (idx < 16) {
+            let powersOfTwo[idx] = power;
+            // double the power for next iteration
+            let power = power + power;
+            let idx = idx + 1;
+        }
+        return;
+    }
+
+    /** Returns the product of x and y.
+     *  When a Jack compiler detects the multiplication operator '*'
+     *  in an expression, it handles it by invoking this method.
+     *  Thus, in Jack, x * y and Math.multiply(x,y) return the same value. */
+    function int multiply(int x, int y) {
+        var int sum, shiftedX, bitIdx;
+
+        let sum = 0;
+        let shiftedX = x;
+        let bitIdx = 0;
+
+        // iterate through each bit of y
+        while (bitIdx < 16) {
+            // if bit is set, add shifted x to sum
+            if (Math.bit(y, bitIdx)) {
+                let sum = sum + shiftedX;
+            }
+            // shift x left by doubling
+            let shiftedX = shiftedX + shiftedX;
+            let bitIdx = bitIdx + 1;
+        }
+        return sum;
+    }
+
+    /** Returns the integer part of x / y.
+     *  When a Jack compiler detects the division operator '/'
+     *  an an expression, it handles it by invoking this method.
+     *  Thus, x/y and Math.divide(x,y) return the same value. */
+    function int divide(int x, int y) {
+        var int quotient;
+        var boolean isNegative;
+
+        // check for division by zero
+        if (y = 0) {
+            do Sys.error(3);
+        }
+
+        let isNegative = false;
+
+        // handle negative dividend
+        if (x < 0) {
+            let isNegative = ~isNegative;
+            let x = -x;
+        }
+
+        // handle negative divisor
+        if (y < 0) {
+            let isNegative = ~isNegative;
+            let y = -y;
+        }
+
+        // perform division on positive values
+        let quotient = Math.divideHelper(x, y);
+
+        // negate result if signs differed
+        if (isNegative) {
+            return -quotient;
+        } else {
+            return quotient;
+        }
+    }
+
+    /** helper function for divide - performs division using binary search */
+    function int divideHelper(int dividend, int divisor) {
+        var int quotient, remainder;
+
+        // base case: divisor is larger than dividend or divisor overflowed
+        if ((divisor > dividend) | (divisor < 0)) {
+            return 0;
+        }
+
+        // recursively divide with doubled divisor
+        let quotient = Math.divideHelper(dividend, divisor + divisor);
+
+        // check if we should add 1 to quotient
+        let remainder = dividend - ((quotient + quotient) * divisor);
+        if (remainder < divisor) {
+            return quotient + quotient;
+        } else {
+            return quotient + quotient + 1;
+        }
+    }
+
+    /** Returns the integer part of the square root of x. */
+    function int sqrt(int x) {
+        var int result, bitIdx, tempValue;
+
+        // check for negative input
+        if (x < 0) {
+            do Sys.error(4);
+        }
+
+        let result = 0;
+        // start from bit 7 and work down to bit 0
+        let bitIdx = 7;
+
+        // iterate through each bit to build sqrt approximation
+        while (bitIdx > -1) {
+            // try adding this power of 2 to result
+            let tempValue = (result + powersOfTwo[bitIdx]) * (result + powersOfTwo[bitIdx]);
+            // if result is valid and doesn't exceed x, include this bit
+            if (~(tempValue > x) & (tempValue > -1)) {
+                let result = result + powersOfTwo[bitIdx];
+            }
+            let bitIdx = bitIdx - 1;
+        }
+
+        return result;
+    }
+
+    /** Returns the greater value. */
+    function int max(int valueA, int valueB) {
+        if (valueA > valueB) {
+            return valueA;
+        } else {
+            return valueB;
+        }
+    }
+
+    /** Returns the smaller value. */
+    function int min(int valueA, int valueB) {
+        if (valueA < valueB) {
+            return valueA;
+        } else {
+            return valueB;
+        }
+    }
+
+    /** Returns the absolute value of x. */
+    function int abs(int x) {
+        if (x < 0) {
+            return -x;
+        } else {
+            return x;
+        }
+    }
+
+    /** Returns true if the i-th bit of x is 1, false otherwise */
+    function boolean bit(int x, int bitPosition) {
+        // check if bit at position is set using bitwise AND
+        return ~((x & powersOfTwo[bitPosition]) = 0);
+    }
+}

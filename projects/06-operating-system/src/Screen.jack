@@ -1,0 +1,157 @@
+// name: Sohni Tagirisa
+// this file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 512 rows (indexed 0..511, top to bottom)
+ * of 256 pixels each (indexed 0..255, left to right). The top left pixel on
+ * the screen is indexed (0,0).
+ */
+class Screen {
+
+    // base address of screen memory (16384)
+    static int screenBase;
+    // current drawing color (true = black, false = white)
+    static boolean drawColor;
+    // array storing powers of two (2^0 through 2^15)
+    static Array powersOfTwo;
+
+    /** Initializes the Screen. */
+    function void init() {
+        var int idx, powerVal;
+        let idx = 0;
+        let powerVal = 1;
+        // allocate array for 16 powers of two
+        let powersOfTwo = Array.new(16);
+        // compute 2^0 through 2^15
+        while (idx < 16) {
+            let powersOfTwo[idx] = powerVal;
+            // double power for next iteration
+            let powerVal = powerVal + powerVal;
+            let idx = idx + 1;
+        }
+        // screen memory starts at 16384
+        let screenBase = 16384;
+        // initialize drawing color to black
+        let drawColor = true;
+        return;
+    }
+
+    /** Erases the entire screen. */
+    function void clearScreen() {
+        var int memAddr;
+        let memAddr = screenBase;
+        // clear all 8192 words of screen memory (256 * 32)
+        while (memAddr < 24577) {
+            do Memory.poke(memAddr, 0);
+            let memAddr = memAddr + 1;
+        }
+        return;
+    }
+
+    /** Sets the current color, to be used for all subsequent drawXXX commands.
+     *  Black is represented by true, white by false. */
+    function void setColor(boolean b) {
+        let drawColor = b;
+        return;
+    }
+
+    /** Draws the (x,y) pixel, using the current color. */
+    function void drawPixel(int x, int y) {
+        var int memAddr, bitPos;
+        // calculate screen memory address for this pixel
+        // 32 words per row, 16 pixels per word
+        let memAddr = screenBase + (y * 32) + (x / 16);
+        // calculate bit position within the word (0-15)
+        let bitPos = x - (x / 16 * 16);
+        // draw pixel by setting or clearing bit in screen memory
+        if (drawColor) {
+            // black: set bit using bitwise OR
+            do Memory.poke(memAddr, Memory.peek(memAddr) | powersOfTwo[bitPos]);
+        } else {
+            // white: clear bit using bitwise AND with negation
+            do Memory.poke(memAddr, Memory.peek(memAddr) & ~powersOfTwo[bitPos]);
+        }
+        return;
+    }
+
+    /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+        var int dx, dy, stepX, stepY, error, e2;
+        // calculate absolute horizontal and vertical distances
+        let dx = Math.abs(x2 - x1);
+        let dy = Math.abs(y2 - y1);
+
+        // determine horizontal direction (1 = right, -1 = left)
+        if (x1 < x2) {
+            let stepX = 1;
+        } else {
+            let stepX = -1;
+        }
+
+        // determine vertical direction (1 = down, -1 = up)
+        if (y1 < y2) {
+            let stepY = 1;
+        } else {
+            let stepY = -1;
+        }
+
+        // initialize error term for bresenham's algorithm
+        let error = dx - dy;
+        // draw pixels along line until endpoint reached
+        while (~((x1 = x2) & (y1 = y2))) {
+            do Screen.drawPixel(x1, y1);
+            // calculate 2 * error for decision making
+            let e2 = error + error;
+            // decide if we move horizontally
+            if (e2 > -dy) {
+                let error = error - dy;
+                let x1 = x1 + stepX;
+            }
+            // decide if we move vertically
+            if (e2 < dx) {
+                let error = error + dx;
+                let y1 = y1 + stepY;
+            }
+        }
+
+        // draw final endpoint pixel
+        do Screen.drawPixel(x1, y1);
+        return;
+    }
+
+    /** Draws a filled rectangle whose top left corner is (x1, y1)
+     *  and bottom right corner is (x2,y2), using the current color. */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+        // draw horizontal lines from top to bottom to fill rectangle
+        while (~(y1 = y2)) {
+            do Screen.drawLine(x1, y1, x2, y1);
+            let y1 = y1 + 1;
+        }
+        // draw final bottom line
+        do Screen.drawLine(x1, y1, x2, y1);
+        return;
+    }
+
+    /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
+    function void drawCircle(int x, int y, int r) {
+        var int leftX, topY, rightX, bottomY;
+        var int vertOffset;
+        // start with offset at negative radius
+        let vertOffset = -r;
+        // iterate through each horizontal line of circle
+        while ((vertOffset < r) | (vertOffset = r)) {
+            // calculate x-coordinates using circle equation: x = sqrt(r^2 - y^2)
+            let leftX = x - Math.sqrt((r * r) - (vertOffset * vertOffset));
+            let topY = y + vertOffset;
+            let rightX = x + Math.sqrt((r * r) - (vertOffset * vertOffset));
+            let bottomY = y + vertOffset;
+            // draw horizontal line across circle at this y-offset
+            do Screen.drawLine(leftX, topY, rightX, bottomY);
+            let vertOffset = vertOffset + 1;
+        }
+        return;
+    }
+}

@@ -1,0 +1,177 @@
+// name: Sohni Tagirisa
+// this file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+
+/**
+ * Represents character strings. In addition for constructing and disposing
+ * strings, the class features methods for getting and setting individual
+ * characters of the string, for erasing the string's last character,
+ * for appending a character to the string's end, and more typical
+ * string-oriented operations.
+ */
+class String {
+
+    // current string length
+    field int len;
+    // maximum string capacity
+    field int maxLen;
+    // character buffer storing string data
+    field Array chars;
+
+    /** Constructs a new empty String with a maximum length of maxLength. */
+    constructor String new(int maxLength) {
+        // ensure at least length 1 to avoid zero-length arrays
+        if (maxLength = 0) {
+            let maxLength = 1;
+        }
+
+        // initialize string as empty
+        let len    = 0;
+        let maxLen = maxLength;
+        // allocate character buffer
+        let chars  = Array.new(maxLength);
+
+        return this;
+    }
+
+    /** Disposes this string. */
+    method void dispose() {
+        // free character buffer
+        do chars.dispose();
+        // free string object itself
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Returns the current length of this string. */
+    method int length() {
+        return len;
+    }
+
+    /** Returns the character at the j-th location of this string. */
+    method char charAt(int j) {
+        return chars[j];
+    }
+
+    /** Sets the character at the j-th location of this string to c. */
+    method void setCharAt(int j, char c) {
+        let chars[j] = c;
+        return;
+    }
+
+    /** Appends c to this string's end and returns this string. */
+    method String appendChar(char c) {
+        // only append if buffer has space
+        if (len < maxLen) {
+            let chars[len] = c;
+            let len = len + 1;
+        }
+        return this;
+    }
+
+    /** Erases the last character from this string. */
+    method void eraseLastChar() {
+        // only erase if string is not empty
+        if (len > 0) {
+            let len = len - 1;
+        }
+        return;
+    }
+
+    /** Returns the integer value of this string,
+     *  until a non-digit character is detected. */
+    method int intValue() {
+        var int intVal, charIdx;
+        var boolean isNegative;
+
+        let intVal = 0;
+
+        // check for leading - sign or ASCII 45
+        if ((len > 0) & (chars[0] = 45)) {
+            let isNegative = true;
+            let charIdx = 1;
+        } else {
+            let isNegative = false;
+            let charIdx = 0;
+        }
+
+        // accumulate digits until non-digit or end of string
+        while ((charIdx < len) & String.isDigit(chars[charIdx])) {
+            let intVal = (intVal * 10) + String.charToDigit(chars[charIdx]);
+            let charIdx = charIdx + 1;
+        }
+
+        // negate result if string was negative
+        if (isNegative) {
+            return -intVal;
+        } else {
+            return intVal;
+        }
+    }
+
+    // returns true iff c is a digit '0'..'9'
+    function boolean isDigit(char c) {
+        return ~(c < 48) & ~(c > 57);
+    }
+
+    // converts digit character '0'..'9' to its integer value 0..9
+    function int charToDigit(char c) {
+        return c - 48;
+    }
+
+    // converts integer digit 0..9 to corresponding character '0'..'9'
+    function char digitToChar(int d) {
+        return d + 48;
+    }
+
+    /** Sets this string to hold a representation of the given value. */
+    method void setInt(int val) {
+        // clear string for new value
+        let len = 0;
+
+        // handle negative numbers
+        if (val < 0) {
+            // work with positive version
+            let val = -val;
+            // append - character
+            do appendChar(45);
+        }
+
+        // append decimal digits
+        do setIntHelper(val);
+        return;
+    }
+
+    // helper method to append decimal digits of val recursively
+    method void setIntHelper(int val) {
+        var int quotient;
+
+        // base case: single digit
+        if (val < 10) {
+            do appendChar(String.digitToChar(val));
+        } else {
+            // recursive case: divide and process
+            let quotient = val / 10;
+            do setIntHelper(quotient);
+            // append remainder as rightmost digit
+            do appendChar(String.digitToChar(val - (quotient * 10)));
+        }
+        return;
+    }
+
+    /** Returns the new line character. */
+    function char newLine() {
+        return 128;
+    }
+
+    /** Returns the backspace character. */
+    function char backSpace() {
+        return 129;
+    }
+
+    /** Returns the double quote (") character. */
+    function char doubleQuote() {
+        return 34;
+    }
+}

@@ -1,0 +1,36 @@
+// name: Sohni Tagirisa
+// this file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// file name: projects/12/Array.jack
+
+/**
+ * Represents an array.
+ * In the Jack language, arrays are instances of the Array class.
+ * Once declared, the array entries can be accessed using the syntax
+ * arr[i]. Jack arrays are not typed (each entry can hold any data type).
+ */
+class Array {
+
+    /**
+     * Constructs a new Array of the given size.
+     */
+    function Array new(int arraySize) {
+        // validate that size is positive
+        if (arraySize < 1) {
+            // call system error handler for invalid size
+            do Sys.error(2);
+        }
+        // allocate memory and return pointer to new array
+        return Memory.alloc(arraySize);
+    }
+
+    /**
+     * Disposes this array and frees its allocated memory.
+     */
+    method void dispose() {
+        // deallocate the memory used by this array
+        do Memory.deAlloc(this);
+        return;
+    }
+}

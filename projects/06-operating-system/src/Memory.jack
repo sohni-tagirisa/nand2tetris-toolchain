@@ -1,0 +1,140 @@
+// name: Sohni Tagirisa
+// this file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */
+class Memory {
+
+    // base address of RAM (0)
+    static Array ram;
+    // start of heap (first heap header)
+    static Array heap;
+    // head of free-list (first free block)
+    static Array freeList;
+
+    /** Initializes the class. */
+    function void init() {
+        // ram base is 0
+        let ram  = 0;
+
+        // heap starts at address 2048
+        let heap = 2048;
+        let freeList = heap;
+
+        // one big initial free block:
+        // header at 2048, payload from 2050 up to 16383
+        // payload size = 16383 - 2050 + 1 = 14334
+        // next free block pointer (null means no next block)
+        let heap[0] = null;
+        // payload size in words
+        let heap[1] = 14334;
+
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        // directly access ram at given address
+        return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        // write value to ram at given address
+        let ram[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address (payload start). */
+    function Array alloc(int size) {
+        var Array currentBlock;
+        var Array prevBlock;
+        var Array newFreeBlock;
+        var int blockSize;
+        var int remainingSize;
+
+        let prevBlock = null;
+        let currentBlock = freeList;
+
+        // search free list for a block big enough
+        while (~(currentBlock = null)) {
+            let blockSize = currentBlock[1];
+
+            // case 1: block big enough to split
+            if (blockSize > (size + 2)) {
+                // new free block header after allocated payload
+                let newFreeBlock  = currentBlock + size + 2;
+                let remainingSize  = blockSize - size - 2;
+                // copy next pointer from current block
+                let newFreeBlock[0] = currentBlock[0];
+                // set remaining payload size
+                let newFreeBlock[1] = remainingSize;
+
+                // update freeList links
+                if (prevBlock = null) {
+                    // new block becomes head of free list
+                    let freeList = newFreeBlock;
+                } else {
+                    // link previous block to new block
+                    let prevBlock[0] = newFreeBlock;
+                }
+
+                // set allocated block header size to requested payload
+                // mark as not on free list anymore
+                let currentBlock[0] = null;
+                // store requested size in header
+                let currentBlock[1] = size;
+
+                // return payload start
+                return currentBlock + 2;
+            } else {
+                // case 2: not splittable, but still big enough?
+                if (~(blockSize < size)) {
+                    // take the whole block
+                    if (prevBlock = null) {
+                        // remove from head of free list
+                        let freeList = currentBlock[0];
+                    } else {
+                        // skip over this block in free list
+                        let prevBlock[0] = currentBlock[0];
+                    }
+
+                    // mark block as no longer free
+                    let currentBlock[0] = null;
+
+                    // return payload start
+                    return currentBlock + 2;
+                }
+            }
+
+            // block too small, move to next
+            let prevBlock = currentBlock;
+            let currentBlock = currentBlock[0];
+        }
+
+        // no space left
+        return null;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array allocatedBlock) {
+        var Array blockHeader;
+
+        // allocatedBlock points to payload, header is 2 words before
+        let blockHeader = allocatedBlock - 2;
+
+        // push this block onto front of the free list
+        let blockHeader[0] = freeList;
+        // update free list to point to this block
+        let freeList  = blockHeader;
+
+        return;
+    }
+}

@@ -1,0 +1,233 @@
+// By Sohni Tagirisa
+// handles word list management and intro screen - MINIMAL MEMORY VERSION
+class WordList {
+    // tracks if intro has been shown to avoid showing it multiple times
+    static int INTRO_SHOWN;
+    static String tempString;
+
+    // returns the word at the given index - builds string on demand
+    function String get(int i) {
+        var int j;
+
+        // initialize temp string if needed
+        if (tempString = null) {
+            let tempString = String.new(5);
+        }
+
+        // clear temp string
+        while (tempString.length() > 0) {
+            do tempString.eraseLastChar();
+        }
+
+        // build the appropriate word
+        if (i = 0) {
+            // APPLE
+            do tempString.appendChar(65);
+            do tempString.appendChar(80);
+            do tempString.appendChar(80);
+            do tempString.appendChar(76);
+            do tempString.appendChar(69);
+        }
+        if (i = 1) {
+            // ROBOT
+            do tempString.appendChar(82);
+            do tempString.appendChar(79);
+            do tempString.appendChar(66);
+            do tempString.appendChar(79);
+            do tempString.appendChar(84);
+        }
+        if (i = 2) {
+            // LASER
+            do tempString.appendChar(76);
+            do tempString.appendChar(65);
+            do tempString.appendChar(83);
+            do tempString.appendChar(69);
+            do tempString.appendChar(82);
+        }
+        if (i = 3) {
+            // BRAIN
+            do tempString.appendChar(66);
+            do tempString.appendChar(82);
+            do tempString.appendChar(65);
+            do tempString.appendChar(73);
+            do tempString.appendChar(78);
+        }
+        if (i = 4) {
+            // WATER
+            do tempString.appendChar(87);
+            do tempString.appendChar(65);
+            do tempString.appendChar(84);
+            do tempString.appendChar(69);
+            do tempString.appendChar(82);
+        }
+        if (i = 5) {
+            // CABLE
+            do tempString.appendChar(67);
+            do tempString.appendChar(65);
+            do tempString.appendChar(66);
+            do tempString.appendChar(76);
+            do tempString.appendChar(69);
+        }
+        if (i = 6) {
+            // MOTOR
+            do tempString.appendChar(77);
+            do tempString.appendChar(79);
+            do tempString.appendChar(84);
+            do tempString.appendChar(79);
+            do tempString.appendChar(82);
+        }
+        if (i = 7) {
+            // PIXEL
+            do tempString.appendChar(80);
+            do tempString.appendChar(73);
+            do tempString.appendChar(88);
+            do tempString.appendChar(69);
+            do tempString.appendChar(76);
+        }
+
+        return tempString;
+    }
+
+    // returns total number of words available (7 levels)
+    function int size() { return 7; }
+
+    // displays intro screen only on first game startup
+    function void showIntro() {
+        if (INTRO_SHOWN = 0) {
+            do Screen.clearScreen();
+            do Output.moveCursor(1, 30);
+            // print "WORDLE"
+            do Output.printChar(87); do Output.printChar(79); do Output.printChar(82);
+            do Output.printChar(68); do Output.printChar(76); do Output.printChar(69);
+
+            do Output.moveCursor(3, 1);
+            // print "Please enter a five letter guess."
+            do Output.printChar(80); do Output.printChar(108); do Output.printChar(101);
+            do Output.printChar(97); do Output.printChar(115); do Output.printChar(101);
+            do Output.printChar(32); do Output.printChar(101); do Output.printChar(110);
+            do Output.printChar(116); do Output.printChar(101); do Output.printChar(114);
+            do Output.printChar(32); do Output.printChar(97); do Output.printChar(32);
+            do Output.printChar(102); do Output.printChar(105); do Output.printChar(118);
+            do Output.printChar(101); do Output.printChar(32); do Output.printChar(108);
+            do Output.printChar(101); do Output.printChar(116); do Output.printChar(116);
+            do Output.printChar(101); do Output.printChar(114); do Output.printChar(32);
+            do Output.printChar(103); do Output.printChar(117); do Output.printChar(101);
+            do Output.printChar(115); do Output.printChar(115); do Output.printChar(46);
+
+            do Output.moveCursor(5, 1);
+            // print "You will have 6 chances to guess the word."
+            do Output.printChar(89); do Output.printChar(111); do Output.printChar(117);
+            do Output.printChar(32); do Output.printChar(119); do Output.printChar(105);
+            do Output.printChar(108); do Output.printChar(108); do Output.printChar(32);
+            do Output.printChar(104); do Output.printChar(97); do Output.printChar(118);
+            do Output.printChar(101); do Output.printChar(32); do Output.printChar(54);
+            do Output.printChar(32); do Output.printChar(99); do Output.printChar(104);
+            do Output.printChar(97); do Output.printChar(110); do Output.printChar(99);
+            do Output.printChar(101); do Output.printChar(115); do Output.printChar(32);
+            do Output.printChar(116); do Output.printChar(111); do Output.printChar(32);
+            do Output.printChar(103); do Output.printChar(117); do Output.printChar(101);
+            do Output.printChar(115); do Output.printChar(115); do Output.printChar(32);
+            do Output.printChar(116); do Output.printChar(104); do Output.printChar(101);
+            do Output.printChar(32); do Output.printChar(119); do Output.printChar(111);
+            do Output.printChar(114); do Output.printChar(100); do Output.printChar(46);
+
+            do Output.moveCursor(7, 1);
+            // print "Keep in Mind: "
+            do Output.printChar(75); do Output.printChar(101); do Output.printChar(101);
+            do Output.printChar(112); do Output.printChar(32); do Output.printChar(105);
+            do Output.printChar(110); do Output.printChar(32); do Output.printChar(77);
+            do Output.printChar(105); do Output.printChar(110); do Output.printChar(100);
+            do Output.printChar(58); do Output.printChar(32);
+
+            do Output.moveCursor(9, 1);
+            // print "1. If a character is correct and in the right spot"
+            do Output.printChar(49); do Output.printChar(46); do Output.printChar(32);
+            do Output.printChar(73); do Output.printChar(102); do Output.printChar(32);
+            do Output.printChar(97); do Output.printChar(32); do Output.printChar(99);
+            do Output.printChar(104); do Output.printChar(97); do Output.printChar(114);
+            do Output.printChar(97); do Output.printChar(99); do Output.printChar(116);
+            do Output.printChar(101); do Output.printChar(114); do Output.printChar(32);
+            do Output.printChar(105); do Output.printChar(115); do Output.printChar(32);
+            do Output.printChar(99); do Output.printChar(111); do Output.printChar(114);
+            do Output.printChar(114); do Output.printChar(101); do Output.printChar(99);
+            do Output.printChar(116); do Output.printChar(32); do Output.printChar(97);
+            do Output.printChar(110); do Output.printChar(100); do Output.printChar(32);
+            do Output.printChar(105); do Output.printChar(110); do Output.printChar(32);
+            do Output.printChar(116); do Output.printChar(104); do Output.printChar(101);
+            do Output.printChar(32); do Output.printChar(114); do Output.printChar(105);
+            do Output.printChar(103); do Output.printChar(104); do Output.printChar(116);
+            do Output.printChar(32); do Output.printChar(115); do Output.printChar(112);
+            do Output.printChar(111); do Output.printChar(116);
+
+            do Output.moveCursor(10, 1);
+            // print " -> a check appears in the box."
+            do Output.printChar(32); do Output.printChar(45); do Output.printChar(62);
+            do Output.printChar(32); do Output.printChar(97); do Output.printChar(32);
+            do Output.printChar(99); do Output.printChar(104); do Output.printChar(101);
+            do Output.printChar(99); do Output.printChar(107); do Output.printChar(32);
+            do Output.printChar(97); do Output.printChar(112); do Output.printChar(112);
+            do Output.printChar(101); do Output.printChar(97); do Output.printChar(114);
+            do Output.printChar(115); do Output.printChar(32); do Output.printChar(105);
+            do Output.printChar(110); do Output.printChar(32); do Output.printChar(116);
+            do Output.printChar(104); do Output.printChar(101); do Output.printChar(32);
+            do Output.printChar(98); do Output.printChar(111); do Output.printChar(120);
+            do Output.printChar(46);
+
+            do Output.moveCursor(12, 1);
+            // print "2. If a character is in the word but in the wrong spot"
+            do Output.printChar(50); do Output.printChar(46); do Output.printChar(32);
+            do Output.printChar(73); do Output.printChar(102); do Output.printChar(32);
+            do Output.printChar(97); do Output.printChar(32); do Output.printChar(99);
+            do Output.printChar(104); do Output.printChar(97); do Output.printChar(114);
+            do Output.printChar(97); do Output.printChar(99); do Output.printChar(116);
+            do Output.printChar(101); do Output.printChar(114); do Output.printChar(32);
+            do Output.printChar(105); do Output.printChar(115); do Output.printChar(32);
+            do Output.printChar(105); do Output.printChar(110); do Output.printChar(32);
+            do Output.printChar(116); do Output.printChar(104); do Output.printChar(101);
+            do Output.printChar(32); do Output.printChar(119); do Output.printChar(111);
+            do Output.printChar(114); do Output.printChar(100); do Output.printChar(32);
+            do Output.printChar(98); do Output.printChar(117); do Output.printChar(116);
+            do Output.printChar(32); do Output.printChar(105); do Output.printChar(110);
+            do Output.printChar(32); do Output.printChar(116); do Output.printChar(104);
+            do Output.printChar(101); do Output.printChar(32); do Output.printChar(119);
+            do Output.printChar(114); do Output.printChar(111); do Output.printChar(110);
+            do Output.printChar(103); do Output.printChar(32); do Output.printChar(115);
+            do Output.printChar(112); do Output.printChar(111); do Output.printChar(116);
+
+            do Output.moveCursor(13, 1);
+            // print " -> a slash appears in the box."
+            do Output.printChar(32); do Output.printChar(45); do Output.printChar(62);
+            do Output.printChar(32); do Output.printChar(97); do Output.printChar(32);
+            do Output.printChar(115); do Output.printChar(108); do Output.printChar(97);
+            do Output.printChar(115); do Output.printChar(104); do Output.printChar(32);
+            do Output.printChar(97); do Output.printChar(112); do Output.printChar(112);
+            do Output.printChar(101); do Output.printChar(97); do Output.printChar(114);
+            do Output.printChar(115); do Output.printChar(32); do Output.printChar(105);
+            do Output.printChar(110); do Output.printChar(32); do Output.printChar(116);
+            do Output.printChar(104); do Output.printChar(101); do Output.printChar(32);
+            do Output.printChar(98); do Output.printChar(111); do Output.printChar(120);
+            do Output.printChar(46);
+
+            do Output.moveCursor(15, 1);
+            // print "Press ENTER to continue.."
+            do Output.printChar(80); do Output.printChar(114); do Output.printChar(101);
+            do Output.printChar(115); do Output.printChar(115); do Output.printChar(32);
+            do Output.printChar(69); do Output.printChar(78); do Output.printChar(84);
+            do Output.printChar(69); do Output.printChar(82); do Output.printChar(32);
+            do Output.printChar(116); do Output.printChar(111); do Output.printChar(32);
+            do Output.printChar(99); do Output.printChar(111); do Output.printChar(110);
+            do Output.printChar(116); do Output.printChar(105); do Output.printChar(110);
+            do Output.printChar(117); do Output.printChar(101); do Output.printChar(46);
+            do Output.printChar(46);
+
+            do Keyboard.readChar();
+            let INTRO_SHOWN = 1;
+        }
+        return;
+    }
+
+    // returns the word at the specified index for the current level
+    function String pick(int wordIndex) {
+        return WordList.get(wordIndex);
+    }
+}
